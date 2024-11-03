@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +68,7 @@ fun TicTacToeGame(viewModel: GameViewModel) {
         board.forEachIndexed { rowIndex, row ->
             Row {
                 row.forEachIndexed { colIndex, cell ->
-                    CellView(cell = cell, onClick = { viewModel.makeMove(rowIndex, colIndex) })
+                    CellView(cell = cell, onClick = { viewModel.makeMove(rowIndex, colIndex) }, position=Pair(rowIndex, colIndex))
                 }
             }
         }
@@ -93,10 +94,11 @@ fun TicTacToeGame(viewModel: GameViewModel) {
 }
 
 @Composable
-fun CellView(cell: Cell, onClick: () -> Unit) {
+fun CellView(cell: Cell, position: Pair<Int, Int>?, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(100.dp)
+            .testTag("cell_${position?.first}_${position?.second}")
             .background(Color.Transparent)
             .border(1.dp, MaterialTheme.colorScheme.onBackground, MaterialTheme.shapes.small)
             .clickable { onClick() },
