@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -28,13 +29,31 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.onWin = { player ->
+            // Handle win: e.g. confetti anim, show dialog, etc.
+        }
+        viewModel.onDraw = {
+            // Handle draw: e.g. change colors, show dialog, etc.
+        }
         setContent {
             TicTacToeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    TicTacToeGame(viewModel)
+                Column {
+                    Text(
+                        text = "Tic Tac Toe",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 24.sp
+                    )
+                    Text(
+                        text = "Current turn: ${viewModel.currentPlayer.value.name}",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 20.sp
+                    )
+                    Surface(
+                        modifier = Modifier.fillMaxSize().padding(0.dp, 16.dp),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        TicTacToeGame(viewModel)
+                    }
                 }
             }
         }
@@ -52,17 +71,15 @@ fun TicTacToeGame(viewModel: GameViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        board?.let {
-            for (row in it.indices) {
-                Row {
-                    for (col in it[row].indices) {
-                        CellView(cell = it[row][col], onClick = { viewModel.makeMove(row, col) })
-                    }
+        board.forEachIndexed { rowIndex, row ->
+            Row {
+                row.forEachIndexed { colIndex, cell ->
+                    CellView(cell = cell, onClick = { viewModel.makeMove(rowIndex, colIndex) })
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Current Player: ${currentPlayer?.name}", fontSize = 20.sp)
+        Text(text = "Current Player: ${currentPlayer.name}", fontSize = 20.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = gameStatus ?: "", fontSize = 20.sp, color = Color.Red)
     }
@@ -73,14 +90,15 @@ fun CellView(cell: Cell, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(100.dp)
-            .background(Color.Gray)
+            .background(Color.Transparent)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = cell.player?.name ?: "",
             fontSize = 36.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
