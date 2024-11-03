@@ -55,4 +55,11 @@ class GameViewModel : ViewModel() {
             line.all { it.player == currentPlayer.value }
         }
     }
+
+    fun resetGame() {
+        board.value = List(3) { List(3) { Cell() } }
+        currentPlayer.value = Player.X
+        winner.value = null
+        gameActive.value = true
+    }
 }

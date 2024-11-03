@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -81,8 +82,12 @@ fun TicTacToeGame(viewModel: GameViewModel) {
                 fontSize = 20.sp,
                 color = if (viewModel.winner.value != null) Color.Red else Color.DarkGray
             )
+            Button(onClick = { viewModel.resetGame() }, Modifier.height(50.dp)) {
+                Text(text = "Restart Game")
+            }
         } else {
             Text(text = "Current Player: ${currentPlayer.name}", fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(50.dp)) // Button placeHolder
         }
     }
 }
