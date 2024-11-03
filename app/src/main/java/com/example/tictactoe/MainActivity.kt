@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,20 +35,15 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             TicTacToeTheme {
-                Column {
+                Column(Modifier.background(MaterialTheme.colorScheme.background)) {
                     Text(
                         text = "Tic Tac Toe",
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(0.dp, 72.dp, 0.dp, 0.dp).fillMaxWidth(),
+                        textAlign = TextAlign.Center,
                         fontSize = 24.sp
                     )
-                    Text(
-                        text = "Current turn: ${viewModel.currentPlayer.value.name}",
-                        modifier = Modifier.padding(16.dp),
-                        fontSize = 20.sp
-                    )
                     Surface(
-                        modifier = Modifier.fillMaxSize().padding(0.dp, 16.dp),
-                        color = MaterialTheme.colorScheme.background
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         TicTacToeGame(viewModel)
                     }
@@ -62,9 +55,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TicTacToeGame(viewModel: GameViewModel) {
-    val board by viewModel.board.observeAsState()
-    val currentPlayer by viewModel.currentPlayer.observeAsState()
-    val gameStatus by viewModel.gameStatus.observeAsState()
+    val board by remember { viewModel.board }
+    val currentPlayer by remember { viewModel.currentPlayer }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -78,10 +70,20 @@ fun TicTacToeGame(viewModel: GameViewModel) {
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Current Player: ${currentPlayer.name}", fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = gameStatus ?: "", fontSize = 20.sp, color = Color.Red)
+
+        // Display winner or current player
+        if (!viewModel.gameActive.value) {
+            val text =  if (viewModel.winner.value != null) "Winner: ${viewModel.winner.value!!.name}"
+                        else "It's a draw!"
+            Text(text = text,
+                fontSize = 20.sp,
+                color = if (viewModel.winner.value != null) Color.Red else Color.DarkGray
+            )
+        } else {
+            Text(text = "Current Player: ${currentPlayer.name}", fontSize = 20.sp)
+        }
     }
 }
 
@@ -91,6 +93,7 @@ fun CellView(cell: Cell, onClick: () -> Unit) {
         modifier = Modifier
             .size(100.dp)
             .background(Color.Transparent)
+            .border(1.dp, MaterialTheme.colorScheme.onBackground, MaterialTheme.shapes.small)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
